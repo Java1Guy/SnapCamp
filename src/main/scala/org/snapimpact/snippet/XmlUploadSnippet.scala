@@ -10,8 +10,11 @@ import common._
 import util._
 import Helpers._
 
-import _root_.scala.xml.{NodeSeq, Text, Group}
 import _root_.java.util.Locale
+import _root_.java.io.ByteArrayInputStream
+import org.snapimpact.etl.model.dto.FootprintFeed
+import xml.{XML, NodeSeq, Text, Group}
+import org.snapimpact.model.MemoryFeedStore
 
 /**
  * Created by IntelliJ IDEA.
@@ -48,12 +51,19 @@ class XmlUploadSnippet {
   def upload(xhtml: NodeSeq): NodeSeq =
     if (S.get_?) bind("ul", chooseTemplate("choose", "get", xhtml),
                     "file_upload" -> fileUpload(ul => theUpload(Full(ul))))
-    else bind("ul", chooseTemplate("choose", "post", xhtml),
-            "file_name" -> theUpload.is.map(v => Text(v.fileName)),
-            "mime_type" -> theUpload.is.map(v => Box.legacyNullTest(v.mimeType).map(Text).openOr(Text("No mime type supplied"))), // Text(v.mimeType)),
-            "length" -> theUpload.is.map(v => Text(v.file.length.toString)),
-            "md5" -> theUpload.is.map(v => Text(hexEncode(md5(v.file))))
-  );
+    else {
+      var itemCount = 0
+      val db = new MemoryFeedStore
+      theUpload.is.map(v => {
+        val theXml = XML.load(new ByteArrayInputStream(v.file))
+        val ff = FootprintFeed.fromXML(theXml)
+        db.create(ff)
+        itemCount = itemCount + ff.opportunities.opps.length
+      })
+      bind("ul", chooseTemplate("choose", "post", xhtml),
+            "results" -> Text(itemCount.toString)
+      )
+    }
 
 
   def lang(xhtml: NodeSeq): NodeSeq =
