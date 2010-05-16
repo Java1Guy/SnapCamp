@@ -9,13 +9,9 @@
 package org.snapimpact.etl
 
 import model.dto._
-import _root_.scala.xml.XML
 import org.specs.Specification
 import _root_.org.specs.runner._
-import org.snapimpact.model._
-
-import org.slf4j.LoggerFactory
-import net.liftweb.util._
+import scala.xml.XML
 
 class PreprocessingSpecTest extends Runner(new PreprocessingSpecs) with JUnit with Console
 
@@ -23,9 +19,9 @@ class PreprocessingSpecs extends Specification
 {
   val volOppXmlGood = <VolunteerOpportunity>
             <volunteerOpportunityID>2002</volunteerOpportunityID>
-            <sponsoringOrganizationsIDs>
+            <sponsoringOrganizationIDs>
               <sponsoringOrganizationID>2</sponsoringOrganizationID>
-            </sponsoringOrganizationsIDs>
+            </sponsoringOrganizationIDs>
             <title>YOUNG ADULT TO HELP GUIDE MERCER COUNTY TEEN VOLUNTEER CLUB</title>
             <volunteersNeeded>3</volunteersNeeded>
             <dateTimeDurations>
@@ -58,9 +54,9 @@ class PreprocessingSpecs extends Specification
           </VolunteerOpportunity>
   val volOppXmlBad = "<VolunteerOpportunity>"+
             "<volunteerOpportunityID>2002</volunteerOpportunityID>"+
-            "<sponsoringOrganizationsIDs>"+
+            "<sponsoringOrganizationIDs>"+
               "<sponsoringOrganizationID>2</sponsoringOrganizationID>"+
-            "</sponsoringOrganizationsIDs>"+
+            "</sponsoringOrganizationIDs>"+
             "<title>YOUNG ADULT TO HELP GUIDE MERCER COUNTY TEEN VOLUNTEER CLUB</title>"+
             "<volunteersNeeded>3</volunteersNeeded>"+
             "<dateTimeDurations>"+
@@ -95,8 +91,8 @@ class PreprocessingSpecs extends Specification
         {
           val item = VolunteerOpportunity.fromXML(volOppXmlGood)
           item.volunteerOpportunityID mustEqual "2002"
-          item.sponsoringOrganizationsIDs.size mustEqual 1
-          item.sponsoringOrganizationsIDs.head mustEqual "2"
+          item.sponsoringOrganizationIDs.size mustEqual 1
+          item.sponsoringOrganizationIDs.head mustEqual "2"
           item.title must find(".*MERCER")
           item.volunteersNeeded must beSome(3)
           item.skills must beSomething
@@ -106,11 +102,11 @@ class PreprocessingSpecs extends Specification
         }
       "handle bad html in VO descriptions" in
         {
-          val theXml = XML.loadString(volOppXmlBad)
+          val theXml = XmlPreprocessor.preProcessString(volOppXmlBad)
           val item = VolunteerOpportunity.fromXML(theXml)
           item.volunteerOpportunityID mustEqual "2002"
-          item.sponsoringOrganizationsIDs.size mustEqual 1
-          item.sponsoringOrganizationsIDs.head mustEqual "2"
+          item.sponsoringOrganizationIDs.size mustEqual 1
+          item.sponsoringOrganizationIDs.head mustEqual "2"
           item.title must find(".*MERCER")
           item.volunteersNeeded must beSome(3)
           item.skills must beSomething
