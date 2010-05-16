@@ -17,7 +17,6 @@ class PreprocessingSpecTest extends Runner(new PreprocessingSpecs) with JUnit wi
 
 class PreprocessingSpecs extends Specification
 {
-
   val volOppXmlBad = "<VolunteerOpportunity>"+
             "<volunteerOpportunityID>2002</volunteerOpportunityID>"+
             "<sponsoringOrganizationIDs>"+
@@ -55,7 +54,7 @@ class PreprocessingSpecs extends Specification
     {
       "handle good html in VO descriptions" in
         {
-          val item = VolunteerOpportunity.fromXML(FootprintRawData.subject)
+          val item = VolunteerOpportunity.fromXML(Map(), FootprintRawData.subject)
           item.volunteerOpportunityID mustEqual "2002"
           item.sponsoringOrganizationIDs.size mustEqual 1
           item.sponsoringOrganizationIDs.head mustEqual "2"
@@ -69,7 +68,7 @@ class PreprocessingSpecs extends Specification
       "handle bad html in VO descriptions" in
         {
           val theXml = XmlPreprocessor.preProcessString(volOppXmlBad)
-          val item = VolunteerOpportunity.fromXML(theXml)
+          val item = VolunteerOpportunity.fromXML(Map(), theXml)
           item.volunteerOpportunityID mustEqual "2002"
           item.sponsoringOrganizationIDs.size mustEqual 1
           item.sponsoringOrganizationIDs.head mustEqual "2"

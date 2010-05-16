@@ -65,7 +65,7 @@ class FeedHtmlRemoverSpecs extends Specification
 
     "Process a description in a Volunteer Opportunity" in
       {
-        val vo = VolunteerOpportunity.fromXML(volunteerOpportunity)
+        val vo = VolunteerOpportunity.fromXML(Map(), volunteerOpportunity)
         println("vo desc="+vo.description.get) // TODO the <p> and <br/> are already gone
         FeedHtmlRemover.htmlRemove(vo).get mustEqual "The quick brown fox"  // TODO where's the \n?
       }
