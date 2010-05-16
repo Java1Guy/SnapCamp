@@ -40,23 +40,18 @@ object XmlPreprocessor {
     s.setByteStream(new ByteArrayInputStream(str.getBytes))
     r.parse(s);
 //    println("Result of '"+str+"' = "+os.toString)
-    val theXML = XML.loadString(os.toString)
+    XML.loadString(os.toString)
   }
 
-  def postProcess(vo:Option[String]) =
+  def postProcess(vo:String) =
   // replace <br ...> with line feed
   // remove </br ...>
   // replace <p> with line feed
   // remove </p ...>
   // remove <...>
-    if (!vo.isEmpty) {
-        Option(vo.get.replaceAll("<br[^>]*>", "\n")
+    vo.replaceAll("<br[^>]*>", "\n")
           .replaceAll("</br[^>]*>", "")
           .replaceAll("<p[^>]*>", "\n")
           .replaceAll("</p[^>]*>", "")
-          .replaceAll("<[^>]*>", ""))
-    } else {
-      vo
-    }
-
+          .replaceAll("<[^>]*>", "")
 }
